@@ -10,16 +10,18 @@
     @file    processor.py
 """
 
-from trac.core import Component, implements
-from trac.wiki.macros import WikiMacroBase
-from trac.wiki.formatter import Formatter, system_message
-from trac.web.chrome import ITemplateProvider
-
-from genshi.builder import tag
-
 import re
 import pkg_resources
 from StringIO import StringIO
+
+from trac.core import implements
+from trac.wiki.macros import WikiMacroBase
+from trac.wiki.formatter import Formatter
+from trac.web.chrome import ITemplateProvider
+
+import markdown2
+
+#pylint: disable=abstract-method
 
 # links, autolinks, and reference-style links
 LINK = re.compile(r'(\]\()([^) ]+)([^)]*\))|(<)([^>]+)(>)|(\n\[[^]]+\]: *)([^ \n]+)(.*\n)')
@@ -37,14 +39,14 @@ MD_EXTRAS = [
 class mdMacro(WikiMacroBase):
     """enables the markdown processor macro."""
     implements(ITemplateProvider)
-    
+
     def expand_macro(self, formatter, name, content):
 
         env = formatter.env
-        abs = env.abs_href.base
-        abs = abs[:len(abs) - len(env.href.base)]
+        _abs = env.abs_href.base
+        _abs = _abs[:len(_abs) - len(env.href.base)]
         f = Formatter(formatter.env, formatter.context)
-        
+
         def convert_links(m):
             pre, target, suf = filter(None, m.groups())
             out = StringIO()
@@ -53,38 +55,14 @@ class mdMacro(WikiMacroBase):
             # Trac creates relative links, which Markdown won't touch inside
             # <autolinks> because they look like HTML
             if pre == '<' and url != target:
-                pre += abs
+                pre += _abs
             return pre + str(url) + suf
-        
-	def emojify(html):
-            pattern = ":([a-z0-9\\+\\-_]+):"
-            link = "<img\
-                alt=\"\\1\"\
-                title=\":\\1:\"\
-                height=\"20\"\
-                style=\"vertical-align:middle\"\
-                width=\"20\"\
-                src=\"/chrome/markdown/emoji/\\1.png\" />"
 
-            emojify_html = re.sub(pattern, link, html)
-            return emojify_html
-
-        try:
-            # Import & convert
-            import markdown2
-            # autolink http:// n stuff
-            autolinked_content = re.sub(LINK, convert_links, content)
-            # convert to markdown
-            html = markdown2.markdown(autolinked_content, extras=MD_EXTRAS)
-            # substitute emojis
-            emojified_html = emojify(html)
-
-            return emojified_html
-        except ImportError:
-            # no markdown2 package found?
-            msg = 'Error importing python-markdown2, install it from '
-            url = 'https://github.com/trentm/python-markdown2'
-            return system_message(tag(msg, tag.a('here', href="%s" % url), '.'))
+        # autolink http:// n stuff
+        autolinked_content = re.sub(LINK, convert_links, content)
+        # convert to markdown
+        html = markdown2.markdown(autolinked_content, extras=MD_EXTRAS)
+        return html
 
     # ITemplateProvider methods
     def get_htdocs_loc(self):

@@ -8,10 +8,8 @@ As the existing processors rely on outdated libraries, this one relies on
 the actively developed
 [python-markdown2](https://github.com/trentm/python-markdown2)
 and bundles the following python-markdown2
-[extras](https://github.com/trentm/python-markdown2/wiki/Extras):   
+[extras](https://github.com/trentm/python-markdown2/wiki/Extras):
 code-friendly, fenced-code-blocks, header-ids, smarty-pants, wiki-tables
-
-Since 1.0.1, this processor supports Emojis according to http://emoji-cheat-sheet.com
 
 
 # Dependencies
@@ -65,20 +63,18 @@ Anything within a `#!md` processor tag will be parsed /w markdown:
     {{{
     #!md
     # h1!
-    
+
     Lorem *ipsum* dolor sit **amet**.
-    
-    :smiley: <- an emoji!
 
     + One
     + Two
     + Three
-    
+
     ```python
     if True:
         print "hi"
     ```
-    
+
     An example [link](http://example.com/ "With a Title").
     }}}
 

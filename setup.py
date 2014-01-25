@@ -8,7 +8,7 @@ setup(
     name = 'TracMarkdownProcessor',
     packages = ['markdown'],
     include_package_data = True,
-    version = '1.0.1-b2',
+    version = '1.0.1-dig0',
 
     author = 'Alexander Dormann',
     author_email = 'alexander.dormann@30doradus.de',
@@ -22,5 +22,8 @@ setup(
         'trac.plugins': ['markdown.processor = markdown.processor']
     },
     classifiers = ['Framework :: Trac'],
-    install_requires = ['Trac'],
+    install_requires = [
+        'Trac',
+        'markdown2',
+    ],
 )
